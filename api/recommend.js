@@ -25,7 +25,7 @@ export default async function handler(req, res) {
 4. 정확히 10곡을 추천해.
 5. 추천 이유는 사용자의 기분/상황에 연결해서 설명해.`;
 
-  const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+  const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
   const body = {
     system_instruction: {
@@ -56,9 +56,7 @@ export default async function handler(req, res) {
     if (!geminiRes.ok) {
       const errText = await geminiRes.text();
       console.error('Gemini API error:', geminiRes.status, errText);
-      return res
-        .status(502)
-        .json({ error: 'AI 서비스 응답 오류', detail: errText });
+      return res.status(502).json({ error: 'AI 서비스 응답 오류' });
     }
 
     const data = await geminiRes.json();
