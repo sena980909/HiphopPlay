@@ -56,7 +56,9 @@ export default async function handler(req, res) {
     if (!geminiRes.ok) {
       const errText = await geminiRes.text();
       console.error('Gemini API error:', geminiRes.status, errText);
-      return res.status(502).json({ error: 'AI 서비스 응답 오류' });
+      return res
+        .status(502)
+        .json({ error: 'AI 서비스 응답 오류', detail: errText });
     }
 
     const data = await geminiRes.json();
