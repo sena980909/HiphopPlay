@@ -8,7 +8,7 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;700;900&display=swap');
 
-  :root { --neon: #00ff00; --neon-dim: #00cc00; }
+  :root { --neon: #4ade80; --neon-dim: #22c55e; }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -23,33 +23,23 @@
   /* ── 네온 글로우 효과 ── */
   .neon-text {
     color: var(--neon);
-    text-shadow:
-      0 0 7px var(--neon),
-      0 0 10px var(--neon),
-      0 0 21px var(--neon),
-      0 0 42px #00803a;
+    text-shadow: 0 0 8px rgba(74,222,128,0.3);
   }
 
   .neon-border {
     border: 1px solid var(--neon);
-    box-shadow:
-      0 0 5px rgba(0,255,0,0.3),
-      inset 0 0 5px rgba(0,255,0,0.1);
   }
 
   .neon-btn {
     background: transparent;
     border: 2px solid var(--neon);
     color: var(--neon);
-    text-shadow: 0 0 8px rgba(0,255,0,0.6);
-    box-shadow: 0 0 10px rgba(0,255,0,0.3), inset 0 0 10px rgba(0,255,0,0.1);
     transition: all 0.3s ease;
   }
   .neon-btn:hover {
     background: var(--neon);
     color: #000;
     text-shadow: none;
-    box-shadow: 0 0 20px rgba(0,255,0,0.6), 0 0 40px rgba(0,255,0,0.3);
   }
   .neon-btn:disabled {
     opacity: 0.4;
@@ -58,15 +48,14 @@
   .neon-btn:disabled:hover {
     background: transparent;
     color: var(--neon);
-    text-shadow: 0 0 8px rgba(0,255,0,0.6);
   }
 
   /* ── 배경 그리드 ── */
   .grid-bg {
     position: fixed; inset: 0; z-index: -1;
     background-image:
-      linear-gradient(rgba(0,255,0,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,255,0,0.03) 1px, transparent 1px);
+      linear-gradient(rgba(74,222,128,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(74,222,128,0.02) 1px, transparent 1px);
     background-size: 40px 40px;
   }
 
@@ -78,10 +67,9 @@
       radial-gradient(circle at center, #111 18%, transparent 19%),
       repeating-radial-gradient(circle at center,
         transparent 0px, transparent 8px,
-        rgba(0,255,0,0.08) 9px, transparent 10px),
+        rgba(74,222,128,0.06) 9px, transparent 10px),
       conic-gradient(from 0deg, #1a1a1a, #222, #1a1a1a, #222, #1a1a1a);
-    border: 3px solid var(--neon);
-    box-shadow: 0 0 15px rgba(0,255,0,0.4);
+    border: 2px solid var(--neon);
     animation: spin 2s linear infinite;
   }
   .lp-spinner::after {
@@ -92,20 +80,18 @@
     width: 12px; height: 12px;
     border-radius: 50%;
     background: var(--neon);
-    box-shadow: 0 0 6px var(--neon);
   }
   @keyframes spin { to { transform: rotate(360deg); } }
 
   /* ── 카드 ── */
   .track-card {
     background: rgba(17,17,17,0.85);
-    border: 1px solid rgba(0,255,0,0.15);
+    border: 1px solid rgba(74,222,128,0.12);
     backdrop-filter: blur(4px);
     transition: all 0.3s ease;
   }
   .track-card:hover {
     border-color: var(--neon);
-    box-shadow: 0 0 15px rgba(0,255,0,0.2);
     transform: translateY(-2px);
   }
 
@@ -125,13 +111,12 @@
     background: #ff0000;
     color: #fff;
     border-color: #ff0000;
-    box-shadow: 0 0 12px rgba(255,0,0,0.4);
   }
 
   /* ── 인풋 ── */
   .mood-input {
     background: rgba(20,20,20,0.9);
-    border: 1px solid rgba(0,255,0,0.25);
+    border: 1px solid rgba(74,222,128,0.2);
     color: #e0e0e0;
     caret-color: var(--neon);
     transition: all 0.3s ease;
@@ -139,9 +124,8 @@
   .mood-input:focus {
     outline: none;
     border-color: var(--neon);
-    box-shadow: 0 0 12px rgba(0,255,0,0.25);
   }
-  .mood-input::placeholder { color: rgba(0,255,0,0.3); }
+  .mood-input::placeholder { color: rgba(74,222,128,0.3); }
 
   /* ── 페이드인 애니메이션 ── */
   @keyframes fadeInUp {
@@ -155,9 +139,9 @@
 
   /* ── 프리셋 칩 ── */
   .chip {
-    background: rgba(0,255,0,0.06);
-    border: 1px solid rgba(0,255,0,0.2);
-    color: rgba(0,255,0,0.7);
+    background: rgba(74,222,128,0.06);
+    border: 1px solid rgba(74,222,128,0.2);
+    color: rgba(74,222,128,0.7);
     padding: 6px 14px;
     border-radius: 999px;
     font-size: 0.8rem;
@@ -166,7 +150,7 @@
     white-space: nowrap;
   }
   .chip:hover {
-    background: rgba(0,255,0,0.15);
+    background: rgba(74,222,128,0.12);
     border-color: var(--neon);
     color: var(--neon);
   }
@@ -174,7 +158,7 @@
   /* ── 스크롤바 ── */
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: #0a0a0a; }
-  ::-webkit-scrollbar-thumb { background: rgba(0,255,0,0.3); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb { background: rgba(74,222,128,0.3); border-radius: 3px; }
 
   .title-font { font-family: 'Black Han Sans', sans-serif; }
 </style>
@@ -233,9 +217,13 @@
 
   <!-- 푸터 -->
   <footer id="footer" class="hidden text-center mt-10 text-xs text-gray-600">
-    Powered by Google Gemini · 아이돌 래퍼 제외, 리얼 국힙 only 🎤
+    Powered by Google Gemini · 아이돌 래퍼 제외, 리얼 국힙 only
   </footer>
 </main>
+
+<div class="text-center pb-6 text-xs text-gray-700">
+  Made by 원이직
+</div>
 
 <script>
 // ── 비상용 하드코딩 데이터(Fallback) ──
