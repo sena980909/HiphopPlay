@@ -649,38 +649,36 @@ function recommend(){
     const keywords=extractKeywords(mood);
     let scored=scoreTracks(keywords);
 
-    // 점수순 정렬, 같으면 랜덤
-    scored.sort((a,b)=>b.score-a.score||(a.rand-b.rand));
+    // 매칭되는 곡 필터 + 아티스트 중복 제거
+    const matched=scored.filter(s=>s.score>0);
 
     let picks;
-    if(scored[0].score===0){
+    if(matched.length===0){
       // 매칭 없으면 랜덤 10곡
       picks=scored.sort(()=>Math.random()-0.5).slice(0,10);
     } else {
-      // 같은 아티스트 중복 제거 (아티스트명 정규화)
+      // 아티스트 중복 제거하여 풀 구성
       const seen=new Set();
-      const unique=[];
-      for(const s of scored){
-        if(s.score===0) break;
+      const pool=[];
+      // 점수순 정렬
+      matched.sort((a,b)=>b.score-a.score);
+      for(const s of matched){
         const artist=T[s.idx].a.replace(/\(.*?\)/g,'').trim();
         if(!seen.has(artist)){
           seen.add(artist);
-          unique.push(s);
-        }
-        if(unique.length>=10) break;
-      }
-      // 10개 미만이면 랜덤으로 채움
-      if(unique.length<10){
-        for(const s of scored){
-          const artist=T[s.idx].a.replace(/\(.*?\)/g,'').trim();
-          if(!seen.has(artist)){
-            seen.add(artist);
-            unique.push(s);
-          }
-          if(unique.length>=10) break;
+          pool.push(s);
         }
       }
-      picks=unique;
+      // 풀에서 가중 랜덤으로 10곡 뽑기 (점수 높을수록 확률↑, 하지만 매번 다르게)
+      const chosen=[];
+      const remain=[...pool];
+      while(chosen.length<10&&remain.length>0){
+        const weights=remain.map(s=>s.score+Math.random()*remain[0].score*0.7);
+        let best=0;
+        for(let i=1;i<weights.length;i++) if(weights[i]>weights[best]) best=i;
+        chosen.push(remain.splice(best,1)[0]);
+      }
+      picks=chosen;
     }
 
     const tracks=picks.map(p=>T[p.idx]);
