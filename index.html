@@ -311,7 +311,7 @@ function renderTracks(tracks) {
 
   tracks.forEach((track, i) => {
     const ytQuery = encodeURIComponent(`${track.artist} ${track.title}`);
-    const ytUrl   = `https://www.youtube.com/results?search_query=${ytQuery}`;
+    const ytUrl   = `https://music.youtube.com/search?q=${ytQuery}`;
 
     const card = document.createElement('div');
     card.className = 'track-card rounded-lg p-4 fade-in-up';
@@ -328,7 +328,7 @@ function renderTracks(tracks) {
           <p class="text-xs text-gray-500 leading-relaxed">${escapeHtml(track.reason)}</p>
         </div>
         <a href="${ytUrl}" target="_blank" rel="noopener noreferrer" class="yt-btn flex items-center gap-1 mt-1">
-          ▶ YouTube
+          ▶ YT Music
         </a>
       </div>
     `;

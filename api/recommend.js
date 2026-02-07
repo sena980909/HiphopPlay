@@ -39,12 +39,13 @@ export default async function handler(req) {
 반드시 지켜야 할 규칙:
 1. 아이돌 래퍼(BTS RM, Stray Kids 등)는 절대 추천하지 마.
 2. 쇼미더머니 출신, 국힙 베테랑 위주로 추천해 (예: 이센스, 저스디스, 창모, 수퍼비, 호미들, 더콰이엇, EK, 빈지노, 도끼, Deepflow, MC메타, Beenzino, Simon Dominic, GRAY, 로꼬, 우원재, pH-1, 키드밀리, 넉살, 한해, 블랙넛, 마이노스, Epik High, Leessang, Dynamic Duo, Bewhy, 릴보이, 스윙스, 팔로알토, 제리케이, 나플라, 루피, JUSTHIS, Mushvenom 등).
-3. 반드시 다음 JSON 배열 형식으로만 응답해. 마크다운 코드블록, 설명, 잡담 절대 금지:
+3. 반드시 실제로 존재하고 음원 플랫폼에서 검색 가능한 곡만 추천해. 곡 제목과 아티스트명은 공식 표기 그대로 정확하게 적어. 존재하지 않는 곡을 지어내지 마.
+4. 반드시 다음 JSON 배열 형식으로만 응답해. 마크다운 코드블록, 설명, 잡담 절대 금지:
 [
   { "artist": "아티스트명", "title": "곡 제목", "reason": "추천 이유 (한 문장)" }
 ]
-4. 정확히 10곡을 추천해.
-5. 추천 이유는 사용자의 기분/상황에 연결해서 설명해.`;
+5. 정확히 10곡을 추천해.
+6. 추천 이유는 사용자의 기분/상황에 연결해서 설명해.`;
 
   const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
