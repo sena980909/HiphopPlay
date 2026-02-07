@@ -34,18 +34,19 @@ export default async function handler(req) {
     });
   }
 
-  const systemPrompt = `너는 한국 힙합(K-HipHop) 전문 DJ야. 사용자의 기분이나 상황에 딱 맞는 국힙 명곡 10곡을 추천해.
+  const systemPrompt = `너는 한국 힙합(K-HipHop) 전문 DJ야. 사용자의 기분이나 상황에 딱 맞는 국힙 명곡 5곡을 추천해.
 
 반드시 지켜야 할 규칙:
 1. 아이돌 래퍼(BTS RM, Stray Kids 등)는 절대 추천하지 마.
-2. 10곡 모두 서로 다른 아티스트로 추천해. 같은 아티스트를 두 번 이상 넣지 마.
-3. 100% 확실하게 실존하는 곡만 추천해. 곡 제목이 정확히 기억나지 않으면 그 곡은 빼고 확실한 다른 곡을 넣어. 유명하고 널리 알려진 히트곡 위주로 추천해. 곡을 절대 지어내지 마.
-4. 반드시 다음 JSON 배열 형식으로만 응답해. 마크다운 코드블록, 설명, 잡담 절대 금지:
+2. 5곡 모두 서로 다른 아티스트로 추천해. 같은 아티스트를 두 번 이상 넣지 마.
+3. 멜론/유튜브 뮤직 차트에 오른 적 있는 유명한 곡만 추천해. 곡 제목은 공식 발매명 그대로 정확히 써. 제목이 확실하지 않으면 그 곡은 빼. 곡을 지어내면 절대 안 돼.
+4. feat. 곡은 메인 아티스트를 artist에 써 (피처링 아티스트를 메인으로 쓰지 마).
+5. 반드시 다음 JSON 배열 형식으로만 응답해. 마크다운 코드블록, 설명, 잡담 절대 금지:
 [
   { "artist": "아티스트명", "title": "곡 제목", "reason": "추천 이유 (한 문장)" }
 ]
-5. 정확히 10곡을 추천해.
-6. 추천 이유는 사용자의 기분/상황에 연결해서 설명해.`;
+6. 정확히 5곡을 추천해.
+7. 추천 이유는 사용자의 기분/상황에 연결해서 설명해.`;
 
   const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
@@ -57,13 +58,13 @@ export default async function handler(req) {
       {
         parts: [
           {
-            text: `내 지금 기분/상황: "${mood.trim()}"\n\n이 기분에 맞는 국힙 10곡을 추천해줘.`,
+            text: `내 지금 기분/상황: "${mood.trim()}"\n\n이 기분에 맞는 국힙 5곡을 추천해줘.`,
           },
         ],
       },
     ],
     generationConfig: {
-      temperature: 0.7,
+      temperature: 0.4,
       maxOutputTokens: 2048,
       thinkingConfig: { thinkingBudget: 0 },
     },
