@@ -288,8 +288,12 @@ async function recommend() {
       throw new Error('올바른 형식이 아닙니다.');
     }
   } catch (err) {
-    console.warn('API 에러, 폴백 사용:', err);
-    tracks = FALLBACK_TRACKS;
+    console.warn('API 에러:', err);
+    loader.classList.add('hidden');
+    errorMsg.textContent = 'AI 호출이 실패했습니다';
+    errorMsg.classList.remove('hidden');
+    goBtn.disabled = false;
+    return;
   }
 
   // 렌더링
