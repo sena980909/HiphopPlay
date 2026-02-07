@@ -39,7 +39,7 @@ export default async function handler(req) {
 반드시 지켜야 할 규칙:
 1. 아이돌 래퍼(BTS RM, Stray Kids 등)는 절대 추천하지 마.
 2. 5곡 모두 서로 다른 아티스트로 추천해. 같은 아티스트를 두 번 이상 넣지 마.
-3. 멜론/유튜브 뮤직 차트에 오른 적 있는 유명한 곡만 추천해. 곡 제목은 공식 발매명 그대로 정확히 써. 제목이 확실하지 않으면 그 곡은 빼. 곡을 지어내면 절대 안 돼.
+3. 공식 뮤직비디오가 유튜브에 있을 정도로 유명한 곡만 추천해. 곡 제목은 공식 발매명 그대로 정확히 써. 제목이 조금이라도 불확실하면 그 곡은 빼고 확실한 곡을 넣어. 곡을 지어내면 절대 안 돼.
 4. feat. 곡은 메인 아티스트를 artist에 써 (피처링 아티스트를 메인으로 쓰지 마).
 5. 반드시 다음 JSON 배열 형식으로만 응답해. 마크다운 코드블록, 설명, 잡담 절대 금지:
 [
@@ -64,9 +64,9 @@ export default async function handler(req) {
       },
     ],
     generationConfig: {
-      temperature: 0.5,
+      temperature: 0.3,
       maxOutputTokens: 2048,
-      thinkingConfig: { thinkingBudget: 0 },
+      thinkingConfig: { thinkingBudget: 1024 },
     },
   };
 
