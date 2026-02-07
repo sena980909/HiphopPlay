@@ -3,350 +3,721 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>국힙 플레이 — K-HipHop AI DJ</title>
+<title>국힙 플레이 — K-HipHop DJ</title>
 <link rel="icon" type="image/jpeg" href="/icon.jpg" />
-<meta property="og:title" content="국힙 플레이 — K-HipHop AI DJ" />
-<meta property="og:description" content="AI DJ에게 기분을 말해봐. 국힙 명곡 5트랙을 틀어줄게." />
+<meta property="og:title" content="국힙 플레이 — K-HipHop DJ" />
+<meta property="og:description" content="기분을 말해봐. 국힙 명곡 10트랙을 틀어줄게." />
 <meta property="og:image" content="https://hiphop-play.vercel.app/icon.jpg" />
 <meta property="og:url" content="https://hiphop-play.vercel.app" />
 <meta property="og:type" content="website" />
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;700;900&display=swap');
-
-  :root { --neon: #4ade80; --neon-dim: #22c55e; }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    font-family: 'Noto Sans KR', sans-serif;
-    background: #0a0a0a;
-    color: #e0e0e0;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  /* ── 네온 글로우 효과 ── */
-  .neon-text {
-    color: var(--neon);
-    text-shadow: 0 0 8px rgba(74,222,128,0.3);
-  }
-
-  .neon-border {
-    border: 1px solid var(--neon);
-  }
-
-  .neon-btn {
-    background: transparent;
-    border: 2px solid var(--neon);
-    color: var(--neon);
-    transition: all 0.3s ease;
-  }
-  .neon-btn:hover {
-    background: var(--neon);
-    color: #000;
-    text-shadow: none;
-  }
-  .neon-btn:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-  }
-  .neon-btn:disabled:hover {
-    background: transparent;
-    color: var(--neon);
-  }
-
-  /* ── 배경 그리드 ── */
-  .grid-bg {
-    position: fixed; inset: 0; z-index: -1;
-    background-image:
-      linear-gradient(rgba(74,222,128,0.02) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(74,222,128,0.02) 1px, transparent 1px);
-    background-size: 40px 40px;
-  }
-
-  /* ── LP 스피너 ── */
-  .lp-spinner {
-    width: 100px; height: 100px;
-    border-radius: 50%;
-    background:
-      radial-gradient(circle at center, #111 18%, transparent 19%),
-      repeating-radial-gradient(circle at center,
-        transparent 0px, transparent 8px,
-        rgba(74,222,128,0.06) 9px, transparent 10px),
-      conic-gradient(from 0deg, #1a1a1a, #222, #1a1a1a, #222, #1a1a1a);
-    border: 2px solid var(--neon);
-    animation: spin 2s linear infinite;
-  }
-  .lp-spinner::after {
-    content: '';
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%,-50%);
-    width: 12px; height: 12px;
-    border-radius: 50%;
-    background: var(--neon);
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* ── 카드 ── */
-  .track-card {
-    background: rgba(17,17,17,0.85);
-    border: 1px solid rgba(74,222,128,0.12);
-    backdrop-filter: blur(4px);
-    transition: all 0.3s ease;
-  }
-  .track-card:hover {
-    border-color: var(--neon);
-    transform: translateY(-2px);
-  }
-
-  /* ── 유튜브 버튼 ── */
-  .yt-btn {
-    background: rgba(255,0,0,0.15);
-    border: 1px solid rgba(255,0,0,0.4);
-    color: #ff4444;
-    font-size: 0.75rem;
-    padding: 4px 10px;
-    border-radius: 4px;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    white-space: nowrap;
-  }
-  .yt-btn:hover {
-    background: #ff0000;
-    color: #fff;
-    border-color: #ff0000;
-  }
-
-  /* ── 인풋 ── */
-  .mood-input {
-    background: rgba(20,20,20,0.9);
-    border: 1px solid rgba(74,222,128,0.2);
-    color: #e0e0e0;
-    caret-color: var(--neon);
-    transition: all 0.3s ease;
-  }
-  .mood-input:focus {
-    outline: none;
-    border-color: var(--neon);
-  }
-  .mood-input::placeholder { color: rgba(74,222,128,0.3); }
-
-  /* ── 페이드인 애니메이션 ── */
-  @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  .fade-in-up {
-    animation: fadeInUp 0.5s ease forwards;
-    opacity: 0;
-  }
-
-  /* ── 프리셋 칩 ── */
-  .chip {
-    background: rgba(74,222,128,0.06);
-    border: 1px solid rgba(74,222,128,0.2);
-    color: rgba(74,222,128,0.7);
-    padding: 6px 14px;
-    border-radius: 999px;
-    font-size: 0.8rem;
-    cursor: pointer;
-    transition: all 0.25s ease;
-    white-space: nowrap;
-  }
-  .chip:hover {
-    background: rgba(74,222,128,0.12);
-    border-color: var(--neon);
-    color: var(--neon);
-  }
-
-  /* ── 스크롤바 ── */
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: #0a0a0a; }
-  ::-webkit-scrollbar-thumb { background: rgba(74,222,128,0.3); border-radius: 3px; }
-
-  .title-font { font-family: 'Black Han Sans', sans-serif; }
+  :root { --neon: #4ade80; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Noto Sans KR',sans-serif; background:#0a0a0a; color:#e0e0e0; min-height:100vh; overflow-x:hidden; }
+  .neon-text { color:var(--neon); text-shadow:0 0 8px rgba(74,222,128,0.3); }
+  .neon-btn { background:transparent; border:2px solid var(--neon); color:var(--neon); transition:all .3s ease; }
+  .neon-btn:hover { background:var(--neon); color:#000; }
+  .neon-btn:disabled { opacity:.4; cursor:not-allowed; }
+  .neon-btn:disabled:hover { background:transparent; color:var(--neon); }
+  .grid-bg { position:fixed; inset:0; z-index:-1; background-image:linear-gradient(rgba(74,222,128,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(74,222,128,0.02) 1px,transparent 1px); background-size:40px 40px; }
+  .lp-spinner { width:100px; height:100px; border-radius:50%; background:radial-gradient(circle at center,#111 18%,transparent 19%),repeating-radial-gradient(circle at center,transparent 0px,transparent 8px,rgba(74,222,128,0.06) 9px,transparent 10px),conic-gradient(from 0deg,#1a1a1a,#222,#1a1a1a,#222,#1a1a1a); border:2px solid var(--neon); animation:spin 2s linear infinite; }
+  .lp-spinner::after { content:''; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:12px; height:12px; border-radius:50%; background:var(--neon); }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .track-card { background:rgba(17,17,17,0.85); border:1px solid rgba(74,222,128,0.12); backdrop-filter:blur(4px); transition:all .3s ease; }
+  .track-card:hover { border-color:var(--neon); transform:translateY(-2px); }
+  .yt-btn { background:rgba(255,0,0,0.15); border:1px solid rgba(255,0,0,0.4); color:#ff4444; font-size:.75rem; padding:4px 10px; border-radius:4px; transition:all .3s ease; text-decoration:none; white-space:nowrap; }
+  .yt-btn:hover { background:#ff0000; color:#fff; border-color:#ff0000; }
+  .mood-input { background:rgba(20,20,20,0.9); border:1px solid rgba(74,222,128,0.2); color:#e0e0e0; caret-color:var(--neon); transition:all .3s ease; }
+  .mood-input:focus { outline:none; border-color:var(--neon); }
+  .mood-input::placeholder { color:rgba(74,222,128,0.3); }
+  @keyframes fadeInUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+  .fade-in-up { animation:fadeInUp .5s ease forwards; opacity:0; }
+  .chip { background:rgba(74,222,128,0.06); border:1px solid rgba(74,222,128,0.2); color:rgba(74,222,128,0.7); padding:6px 14px; border-radius:999px; font-size:.8rem; cursor:pointer; transition:all .25s ease; white-space:nowrap; }
+  .chip:hover { background:rgba(74,222,128,0.12); border-color:var(--neon); color:var(--neon); }
+  ::-webkit-scrollbar { width:6px; }
+  ::-webkit-scrollbar-track { background:#0a0a0a; }
+  ::-webkit-scrollbar-thumb { background:rgba(74,222,128,0.3); border-radius:3px; }
+  .title-font { font-family:'Black Han Sans',sans-serif; }
 </style>
 </head>
 <body>
-
 <div class="grid-bg"></div>
 
-<!-- ══════════════ HEADER ══════════════ -->
 <header class="text-center pt-10 pb-6 px-4">
   <h1 class="title-font text-4xl md:text-6xl neon-text tracking-wide">국힙 플레이</h1>
   <p class="mt-3 text-sm md:text-base text-gray-500 max-w-md mx-auto">
-    AI DJ에게 기분을 말해봐. 국힙 명곡 5트랙을 틀어줄게.
+    기분을 말해봐. 국힙 명곡 10트랙을 틀어줄게.
   </p>
 </header>
 
-<!-- ══════════════ INPUT SECTION ══════════════ -->
 <main class="max-w-2xl mx-auto px-4 pb-20">
-
-  <!-- 프리셋 칩 -->
   <div class="flex flex-wrap gap-2 justify-center mb-5" id="presets">
-    <button class="chip" onclick="setMood('새벽감성, 혼술할 때')">🌙 새벽 혼술</button>
-    <button class="chip" onclick="setMood('운동할 때 빡세게')">🔥 운동 부스터</button>
-    <button class="chip" onclick="setMood('드라이브 밤거리')">🚗 밤 드라이브</button>
-    <button class="chip" onclick="setMood('자존감 올릴 때 플렉스')">💎 플렉스</button>
-    <button class="chip" onclick="setMood('비오는 날 우울할 때')">🌧️ 비오는 날</button>
-    <button class="chip" onclick="setMood('헤어지고 분노할 때')">💔 이별 후 분노</button>
+    <button class="chip" onclick="setMood('새벽 혼술 우울')">🌙 새벽 혼술</button>
+    <button class="chip" onclick="setMood('운동 파워 에너지')">🔥 운동 부스터</button>
+    <button class="chip" onclick="setMood('드라이브 밤 도시')">🚗 밤 드라이브</button>
+    <button class="chip" onclick="setMood('돈 성공 자신감')">💎 플렉스</button>
+    <button class="chip" onclick="setMood('비 우울 이별 감성')">🌧️ 비오는 날</button>
+    <button class="chip" onclick="setMood('분노 빡침 회사 스트레스')">💢 빡침</button>
+    <button class="chip" onclick="setMood('사랑 달달 썸 데이트')">💕 사랑</button>
+    <button class="chip" onclick="setMood('클럽 파티 술 밤')">🍾 파티</button>
   </div>
 
-  <!-- 입력 폼 -->
   <div class="flex gap-3 items-stretch">
-    <input
-      id="moodInput"
-      type="text"
-      class="mood-input flex-1 rounded-lg px-4 py-3 text-sm md:text-base"
-      placeholder="지금 기분이 어때? (예: 새벽에 비 오는데 혼술 중)"
-      maxlength="200"
-      onkeydown="if(event.key==='Enter')recommend()"
-    />
+    <input id="moodInput" type="text" class="mood-input flex-1 rounded-lg px-4 py-3 text-sm md:text-base"
+      placeholder="지금 기분이 어때? (예: 상사 때문에 빡침)" maxlength="200"
+      onkeydown="if(event.key==='Enter')recommend()" />
     <button id="goBtn" class="neon-btn rounded-lg px-5 py-3 font-bold text-sm md:text-base" onclick="recommend()">
       추천받기
     </button>
   </div>
 
-  <!-- 로딩 -->
   <div id="loader" class="hidden flex flex-col items-center mt-14 gap-5">
     <div class="lp-spinner relative"></div>
     <p class="text-sm neon-text animate-pulse tracking-wider">DJ가 LP판을 고르는 중...</p>
   </div>
 
-  <!-- 에러 메시지 -->
-  <div id="errorMsg" class="hidden mt-6 text-center text-yellow-400 text-sm"></div>
-
-  <!-- 결과 리스트 -->
   <div id="results" class="mt-8 space-y-3"></div>
 
-  <!-- 푸터 -->
   <footer id="footer" class="hidden text-center mt-10 text-xs text-gray-600">
-    Powered by Google Gemini · 아이돌 래퍼 제외, 리얼 국힙 only
+    아이돌 래퍼 제외, 리얼 국힙 only
   </footer>
 </main>
 
-<div class="text-center pb-6 text-xs text-gray-700">
-  Made by 원이직
-</div>
+<div class="text-center pb-6 text-xs text-gray-700">Made by 원이직</div>
 
 <script>
-// ── 비상용 하드코딩 데이터(Fallback) ──
-const FALLBACK_TRACKS = [
-  { artist: "이센스", title: "의리", reason: "국힙의 정수, 어떤 기분에도 통하는 클래식." },
-  { artist: "에픽하이", title: "우산", reason: "비 오는 날의 국민 힙합 발라드." },
-  { artist: "빈지노", title: "Dali, Van, Picasso", reason: "감각적인 프로듀싱과 랩의 완벽한 조화." },
-  { artist: "다이나믹 듀오", title: "죽일 놈", reason: "기분 전환엔 역시 이 곡." },
-  { artist: "창모", title: "마에스트로 (Maestro)", reason: "밤하늘 아래 감성을 터뜨리는 명곡." }
+const T = [
+// ── data1/1.txt: 분노 / 빡침 / 종합 ──
+{a:"저스디스(JUSTHIS)",t:"Gone",g:["분노","혐오","회사","인생","다꺼져","빡침"]},
+{a:"저스디스(JUSTHIS)",t:"IndiGO",g:["신남","달려","빡침","질주"]},
+{a:"김심야",t:"Interior",g:["혐오","예술","마이웨이","어두움"]},
+{a:"Black Nut(블랙넛)",t:"Silky Bois",g:["광기","분노","욕","스트레스"]},
+{a:"IGNITO(이그니토)",t:"Lost Chronicles",g:["악마","지옥","어두움","딥"]},
+{a:"조광일",t:"곡예사",g:["속도","타격감","쾌감","스트레스해소"]},
+{a:"우원재",t:"시차",g:["새벽","일","피곤","성공","마이웨이"]},
+{a:"EK",t:"God God God",g:["퍼포먼스","신남","댄스","자신감"]},
+{a:"EK",t:"직진",g:["빠꾸없음","상남자","질주"]},
+{a:"던말릭",t:"PAID IN SEOUL",g:["서울","돈","성공","붐뱁"]},
+{a:"나플라(nafla)",t:"Wu",g:["붐뱁","박자","고개","힙합"]},
+{a:"XXX",t:"승무원",g:["혐오","비판","까칠","예술"]},
+{a:"E-Sens(이센스)",t:"Writer's Block",g:["슬럼프","일","답답","인생"]},
+{a:"E-Sens(이센스)",t:"The Anecdote",g:["과거","회상","눈물","진지"]},
+{a:"Dok2(도끼)",t:"Beverly 1lls",g:["돈","성공","야망","자수성가"]},
+{a:"창모(CHANGMO)",t:"마에스트로",g:["성공","돈","자신감","클럽"]},
+{a:"창모(CHANGMO)",t:"METEOR",g:["파티","신남","대박","우주"]},
+{a:"호미들",t:"사이렌",g:["가난","성공","돈","친구","바닥"]},
+{a:"호미들",t:"300",g:["전쟁","자신감","남자","의리"]},
+{a:"UNEDUCATED KID",t:"Amazing",g:["돈","기만","웃김","플렉스"]},
+{a:"수퍼비(SUPERBEE)",t:"Heu!",g:["약올림","신남","랩스킬","트랩"]},
+{a:"수퍼비(SUPERBEE)",t:"+82 Bars",g:["스킬","국힙원탑","자신감"]},
+{a:"ZICO",t:"거북선",g:["동양","파워","신남","전투"]},
+{a:"Mino",t:"겁",g:["가족","성공","두려움","아버지"]},
+{a:"BewhY(비와이)",t:"Forever",g:["신","영원","자신감","피아노"]},
+{a:"BewhY(비와이)",t:"GOTTASADAE",g:["웅장","카리스마","리더"]},
+{a:"C Jamm(씨잼)",t:"포커페이스",g:["여유","섹시","마이웨이"]},
+{a:"C Jamm(씨잼)",t:"신기루",g:["디스","환멸","솔직","역대급"]},
+{a:"BILL STAX",t:"Lonely Stoner",g:["몽환","떨","휴식","집"]},
+{a:"The Quiett",t:"Prime Time",g:["성공","베테랑","여유","밤"]},
+{a:"The Quiett",t:"Bentley",g:["차","돈","드라이브","성공"]},
+{a:"Paloalto(팔로알토)",t:"Good Times",g:["긍정","행복","옛날","추억"]},
+{a:"Deepflow(딥플로우)",t:"작두",g:["신남","공연","에너지","파워"]},
+{a:"Nucksal(넉살)",t:"필라멘트",g:["노력","빛","감동","미래"]},
+{a:"Nucksal(넉살)",t:"작은 것들의 신",g:["위로","서민","공감"]},
+{a:"VMC",t:"티키타카",g:["팀워크","신남","놀자"]},
+{a:"개코",t:"될 대로 되라고 해",g:["포기","폭발","스트레스","운전"]},
+{a:"Dynamic Duo",t:"고백",g:["사랑","이별","후회","새벽"]},
+{a:"Epik High",t:"Born Hater",g:["헤이팅","복수","자신감","단체"]},
+{a:"Beenzino(빈지노)",t:"Aqua Man",g:["사랑","어장관리","여름","수영"]},
+{a:"Beenzino(빈지노)",t:"Dali, Van, Picasso",g:["예술","영감","천재","갤러리"]},
+{a:"Beenzino(빈지노)",t:"Break",g:["자유","일탈","깨부숴","퇴사"]},
+{a:"Jazzyfact",t:"아까워",g:["시간","청춘","여유","카페"]},
+{a:"Sik-K",t:"랑데뷰",g:["섹시","밤","데이트","트렌디"]},
+{a:"pH-1",t:"Homebody",g:["집돌이","혼자","편안","휴식"]},
+{a:"Jay Park",t:"몸매",g:["클럽","섹시","파티","춤"]},
+{a:"Kid Milli",t:"WHY DO FUCKBOIS HANG OUT...",g:["트렌드","패션","홍대","반항"]},
+{a:"NO:EL",t:"굽",g:["반항","10대","치기","화"]},
+{a:"Giriboy(기리보이)",t:"호구",g:["짝사랑","찌질","귀여움","발라드"]},
+{a:"Giriboy(기리보이)",t:"교통정리",g:["이별","정리","우울","겨울"]},
+{a:"ASH ISLAND",t:"Paranoid",g:["우울","고독","도시","불면증"]},
+{a:"ASH ISLAND",t:"Melody",g:["이별","감성","락힙합","기억"]},
+{a:"Leellamarz",t:"야망",g:["바이올린","성공","노력","클래식"]},
+{a:"TOIL",t:"거짓말",g:["사랑","이별","기타","감성"]},
+{a:"Paul Blanco",t:"Summer",g:["여름","휴가","바다","칠"]},
+{a:"CAMO",t:"Life is Wet",g:["섹시","돈","여자","매력"]},
+{a:"BIBI",t:"Kazino",g:["위험","도박","영화","스릴"]},
+{a:"DPR LIVE",t:"Jasmine",g:["달달","사랑","여행","색감"]},
+{a:"DPR LIVE",t:"Martini Blue",g:["여행","바다","청량","드라이브"]},
+{a:"Crush",t:"Oasis",g:["여유","휴가","노래","행복"]},
+{a:"Dean",t:"D",g:["새벽","감성","R&B","술"]},
+{a:"Zion.T",t:"양화대교",g:["가족","행복","눈물","위로"]},
+{a:"Swings(스윙스)",t:"불도저",g:["파워","돌진","괴물","에너지"]},
+{a:"Swings(스윙스)",t:"Holy",g:["자신감","종교","믿음","사장"]},
+{a:"Han Yo Han(한요한)",t:"범퍼카",g:["소리질러","락","폭주","스트레스"]},
+{a:"YUMDDA(염따)",t:"돈 Call Me",g:["돈","성공","전화","플렉스"]},
+{a:"Gaeko(개코)",t:"No Make Up",g:["사랑","쌩얼","달달","여자친구"]},
+{a:"Primary",t:"독",g:["현실","직장","쓴맛","소주"]},
+{a:"Supreme Team",t:"땡땡땡",g:["노래방","신남","옛날","추억"]},
+{a:"Verbal Jint",t:"좋아보여",g:["헤어진","강남","우연","쿨함"]},
+{a:"San E",t:"아는사람 얘기",g:["짝사랑","공감","스토리","대중"]},
+{a:"Mad Clown",t:"화",g:["싸움","연애","집착","화해"]},
+{a:"Gary",t:"TV를 껐네",g:["19금","밤","연인","무드"]},
+{a:"Leessang",t:"Rush",g:["인생","질주","친구","힙합"]},
+{a:"YDG",t:"골목길",g:["블루스","느낌","옛날","감성"]},
+{a:"Iron(아이언)",t:"독기",g:["돈","성공","독기","눈빛"]},
+{a:"Bobby",t:"연결고리#힙합",g:["공연","떼창","에너지","아이돌X"]},
+{a:"MUSHVENOM",t:"VVS",g:["성공","보석","노력","무대"]},
+{a:"Mirani",t:"Achoo",g:["귀여움","성공","반전","겨울"]},
+{a:"Khundi Panda",t:"뿌리",g:["정체성","철학","단단","실력"]},
+{a:"Wonstein",t:"적외선 카메라",g:["독특","음색","사랑","외계"]},
+{a:"Sokodomo",t:"회전목마",g:["인생","돌고돌아","히트","동화"]},
+{a:"BE'O",t:"Counting Stars",g:["밤하늘","할아버지","감성","싱잉"]},
+{a:"Big Naughty",t:"낭만교향곡",g:["사랑","짝사랑","밤","전화"]},
+{a:"H1GHR MUSIC",t:"The Purge",g:["다죽여","사이렌","갱","단체"]},
+{a:"Rain",t:"깡 Remix",g:["밈","신남","춤","비"]},
+{a:"Okasian",t:"소문내",g:["유행","하이라이트","옛날","트랩"]},
+{a:"Keith Ape",t:"It G Ma",g:["해외","수중","유니크","세계"]},
+{a:"Balming Tiger",t:"Armadillo",g:["대안","괴짜","재미","독특"]},
+// ── data1/2.txt: 감성 / 새벽 / 우울 / 이별 ──
+{a:"Skinny Brown",t:"Fix You",g:["우울","상처","위로","새벽"]},
+{a:"Skinny Brown",t:"Angel",g:["이별","천사","눈물","비"]},
+{a:"TOIL",t:"너 포에버",g:["사랑","기타","감성","봄"]},
+{a:"TOIL",t:"Black Heart",g:["검은하트","상처","관계","후회"]},
+{a:"Leellamarz(릴러말즈)",t:"Gone",g:["떠남","후회","도시","야경"]},
+{a:"Leellamarz(릴러말즈)",t:"Trip",g:["여행","휴식","비행기","여유"]},
+{a:"Way Ched",t:"Everything",g:["전부","사랑","달달","행복"]},
+{a:"ASH ISLAND",t:"Error",g:["오류","혼란","우울","삭제"]},
+{a:"ASH ISLAND",t:"Beautiful",g:["아름다움","슬픔","기억","꽃"]},
+{a:"Bloo(블루)",t:"Downtown Baby",g:["술","LA","도시","중독"]},
+{a:"Bloo(블루)",t:"I'm the one",g:["나야","주인공","드라마","밤"]},
+{a:"Code Kunst(코드쿤스트)",t:"Parachute",g:["청춘","낙하산","바람","자유"]},
+{a:"Code Kunst(코드쿤스트)",t:"Flower",g:["꽃","향기","봄","위로"]},
+{a:"Woo(우원재)",t:"Job",g:["일","돈","직업","현타"]},
+{a:"Woo(우원재)",t:"We Are",g:["우리","친구","홍대","젊음"]},
+{a:"Loco(로꼬)",t:"시간이 들겠지",g:["이별","시간","기다림","술"]},
+{a:"Loco(로꼬)",t:"남아있어",g:["추억","향수","그리움","과거"]},
+{a:"Heize(헤이즈)",t:"비도 오고 그래서",g:["비","장마","우산","이별"]},
+{a:"Heize(헤이즈)",t:"널 너무 모르고",g:["후회","미안","과거","선물"]},
+{a:"Colde(콜드)",t:"와르르",g:["무너짐","마음","벽","젠가"]},
+// 드라이브 / 신남 / 노동요
+{a:"Changmo(창모)",t:"Selfmade Orange",g:["성공","주황색","차","명품"]},
+{a:"Changmo(창모)",t:"Band",g:["밴드","동네","친구","성공"]},
+{a:"Beenzino",t:"Boogie On & On",g:["춤","밤새","파티","지루해"]},
+{a:"Beenzino",t:"Always Awake",g:["밤샘","노력","청춘","깨어있음"]},
+{a:"ZICO",t:"Any Song",g:["심심","춤","틱톡","집"]},
+{a:"ZICO",t:"Artist",g:["예술","그림","물감","창작"]},
+{a:"ZICO",t:"Okey Dokey",g:["긍정","수락","예스","자신감"]},
+{a:"Mino",t:"Fiancé",g:["아낙네","그리움","힙합","뽕짝"]},
+{a:"G-Dragon",t:"Crooked",g:["삐딱","반항","소리","해방"]},
+{a:"Penomeco",t:"COCO BOTTLE",g:["콜라","청량","여름","톡톡"]},
+{a:"Dynamic Duo",t:"불꽃놀이",g:["축제","폭죽","한강","데이트"]},
+{a:"Dynamic Duo",t:"출첵",g:["학교","출석","추억","신남"]},
+{a:"Simon Dominic",t:"Simon Dominic",g:["이름","부산","사투리","컴백"]},
+{a:"Simon Dominic",t:"GOTT",g:["파티","클럽","술","밤"]},
+{a:"Jay Park(박재범)",t:"All I Wanna Do",g:["춤","여자","파티","영어"]},
+{a:"Jay Park(박재범)",t:"Solo",g:["솔로","외로움","자유","작업"]},
+{a:"Sik-K",t:"파티(Party)",g:["파티","초대","술","크루"]},
+{a:"GroovyRoom",t:"Sunday",g:["일요일","휴일","늦잠","브런치"]},
+// 빡센 랩 / 붐뱁 / 국힙 근본
+{a:"E-Sens",t:"Sleep Tight",g:["잠","불면","걱정","내일"]},
+{a:"E-Sens",t:"Radar",g:["감시","레이더","가짜","리얼"]},
+{a:"Gaeko",t:"Rhythm is Life",g:["리듬","인생","박자","삶"]},
+{a:"YDG(양동근)",t:"개키워",g:["개","동물","유니크","마이웨이"]},
+{a:"Drunken Tiger",t:"Monster",g:["괴물","전설","옛날","발라버려"]},
+{a:"Drunken Tiger",t:"난 널 원해",g:["사랑","클래식","고백","원해"]},
+{a:"Verbal Jint",t:"You Look Good",g:["좋아보여","전여친","길거리","우연"]},
+{a:"Swings",t:"듣고 있어?",g:["전화","음성","메시지","고백"]},
+{a:"Justhis",t:"VVS",g:["보석","성공","알바","과거"]},
+{a:"Huckleberry P",t:"Everest",g:["등산","정상","도전","열정"]},
+{a:"Huckleberry P",t:"Rap Badr Hari",g:["싸움","전투","랩","공격"]},
+{a:"Don Malik",t:"전염",g:["바이러스","퍼짐","스킬","붐뱁"]},
+{a:"Deepflow",t:"Bucket List",g:["목표","꿈","죽음","리스트"]},
+{a:"Nucksal",t:"Nuckle Flow",g:["플로우","기술","유연","물"]},
+{a:"Ignito",t:"Demolition",g:["파괴","철거","어두움","하드코어"]},
+{a:"Hungry Noma",t:"Hungry",g:["배고픔","헝그리","초심","바닥"]},
+// 돈 / 플렉스 / 야망
+{a:"The Quiett",t:"1 Life 2 Live",g:["인생","한번","욜로","즐겨"]},
+{a:"The Quiett",t:"Glofo ii",g:["골프","여유","사장","CEO"]},
+{a:"Superbee",t:"냉탕에 상어",g:["동심","목욕탕","상어","귀여움"]},
+{a:"Superbee",t:"Rap Legend",g:["전설","역사","자신감","최고"]},
+{a:"Uneducated Kid",t:"U N E D U C A T E D K I D",g:["이름","무식","용감","돈"]},
+{a:"Uneducated Kid",t:"Hoodstar",g:["동네","스타","유명","인기"]},
+{a:"Paul Blanco",t:"Believe",g:["믿음","신뢰","종교","기도"]},
+{a:"Homies",t:"진인사대천명",g:["운명","하늘","노력","성공"]},
+{a:"Homies",t:"Dwayne Johnson",g:["근육","힘","파워","강함"]},
+{a:"Royal 44",t:"Volcanic Eruption",g:["화산","폭발","에너지","트랩"]},
+{a:"Lil Moshpit",t:"Yooooo",g:["인사","친구","놀자","하이"]},
+{a:"Fleeky Bang",t:"Gang Gang",g:["갱","조직","패거리","무서움"]},
+// 트렌디 / 칠 / R&B 힙합
+{a:"DPR IAN",t:"So Beautiful",g:["아름다움","광기","예술","영화"]},
+{a:"DPR IAN",t:"No Blueberries",g:["블루베리","디저트","달콤","색깔"]},
+{a:"BIG Naughty(서동현)",t:"Joker",g:["조커","카드","게임","장난"]},
+{a:"BIG Naughty(서동현)",t:"Frank Ocean",g:["바다","동경","아티스트","천재"]},
+{a:"BE'O(비오)",t:"Limousine",g:["리무진","차","성공","변화"]},
+{a:"BE'O(비오)",t:"Love Me",g:["사랑","관심","애정","부탁"]},
+{a:"Wonstein",t:"X",g:["없음","거절","미지수","독특"]},
+{a:"Mudd the student",t:"불협화음",g:["소음","천재","돌연변이","락"]},
+{a:"Sokodomo",t:"MM",g:["음음","고민","생각","물음표"]},
+{a:"Khundi Panda",t:"Hero",g:["영웅","구원","주인공","만화"]},
+{a:"Lee Young Ji(이영지)",t:"Day & Night",g:["낮","밤","하루","반복"]},
+{a:"Layone(래원)",t:"느린심장박동",g:["심장","긴장","속도","런닝"]},
+{a:"Basick",t:"08베이식",g:["과거","전성기","스킬","속사포"]},
+{a:"Lil Boi(릴보이)",t:"Tomorrow",g:["내일","미래","희망","태양"]},
+{a:"Lil Boi(릴보이)",t:"Credit",g:["엔딩","감사","마무리","영화"]},
+{a:"Giriboy",t:"제설",g:["눈","겨울","추위","청소"]},
+{a:"Giriboy",t:"이혼서류",g:["이별","서류","법원","끝"]},
+{a:"Kid Milli",t:"Honmono",g:["진짜","오타쿠","일본","유니크"]},
+{a:"Jvcki Wai",t:"Enchanted Propaganda",g:["마법","선동","여왕","오토튠"]},
+{a:"Iron",t:"Rock Bottom",g:["바닥","절망","반항","락"]},
+// ── data1/3.txt: 올드스쿨 / 근본 ──
+{a:"CB Mass",t:"진짜",g:["진짜","가짜","근본","옛날"]},
+{a:"CB Mass",t:"휘파람",g:["휘파람","우정","추억","거리"]},
+{a:"Drunken Tiger",t:"너희가 힙합을 아느냐",g:["시작","전설","술","질문"]},
+{a:"Drunken Tiger",t:"8:45 Heaven",g:["추모","할머니","눈물","천국"]},
+{a:"Yoonmirae(윤미래)",t:"Black Happiness",g:["혼혈","차별","극복","디바"]},
+{a:"Yoonmirae(윤미래)",t:"Memories",g:["기억","추억","옛날","감동"]},
+{a:"Garion(가리온)",t:"무투",g:["싸움","언더","홍대","무대"]},
+{a:"Garion(가리온)",t:"영순위",g:["0순위","최고","순수","열정"]},
+{a:"P-Type(피타입)",t:"돈키호테",g:["라임","장인","교과서","모험"]},
+{a:"Dead'P(데드피)",t:"날개짓",g:["하드코어","빅딜","어두움","비상"]},
+{a:"Soul Company",t:"아에이오우",g:["단체","학창시절","소울","기본"]},
+{a:"Kebee(키비)",t:"미운오리새끼",g:["성장","왕따","동화","일기"]},
+{a:"The Quiett",t:"상자 속 젊음",g:["젊음","고민","방구석","꿈"]},
+{a:"Loopy(루피)",t:"Gear 2",g:["기어","변신","스킬","패기"]},
+{a:"Nafla(나플라)",t:"MERCY",g:["자비","붐뱁","LA","박자"]},
+{a:"Owen(오왼)",t:"City",g:["도시","서울","야경","붐뱁"]},
+{a:"MKIT RAIN",t:"Weathermen",g:["날씨","비","우산","크루"]},
+// 술 / 취함 / 클럽 / 19금
+{a:"YUMDDA(염따)",t:"줌",g:["줌","땡겨","여자","장난"]},
+{a:"YUMDDA(염따)",t:"아마두",g:["성공","크리스마스","겨울","친구"]},
+{a:"Simon Dominic",t:"DAx4",g:["기분","취함","반복","중독"]},
+{a:"Woo(우원재)",t:"호불호",g:["취향","술","성격","호불호"]},
+{a:"Zene The Zilla",t:"전화하지마 비행기 모드",g:["차단","연락","휴식","방해"]},
+{a:"Zene The Zilla",t:"ITX",g:["기차","여행","춘천","속도"]},
+{a:"Uneducated Kid",t:"룰루랄라",g:["장난","무시","행복","조롱"]},
+{a:"Futuristic Swaver",t:"NISEKOI",g:["사랑","가짜","애니","덕후"]},
+{a:"Yuzion",t:"Jealousy",g:["질투","어림","성공","부러움"]},
+{a:"H1GHR MUSIC",t:"Teléfono",g:["전화","라틴","스페인","춤"]},
+{a:"Sik-K",t:"iffy",g:["애매","밀당","술","고백"]},
+{a:"GroovyRoom",t:"붕붕",g:["비행","하늘","기분","업"]},
+{a:"Coogie(쿠기)",t:"Wifey",g:["결혼","여자친구","사랑","약속"]},
+{a:"Bla$e(블라세)",t:"Peace Out",g:["작별","평화","드릴","영국"]},
+{a:"Roh Yun Ha(노윤하)",t:"Vroom",g:["부릉","오토바이","소리","고등"]},
+// 전투 / 디스 / 경쟁
+{a:"Superbee",t:"앰뷸런스",g:["디스","병원","실려감","팩트"]},
+{a:"Black Nut",t:"100",g:["돈","어그로","백","관종"]},
+{a:"Black Nut",t:"Indigo Child",g:["문제아","반항","천재","돌아이"]},
+{a:"Swings",t:"King Swings",g:["왕","일인자","통제","권력"]},
+{a:"Control Beat",t:"Control",g:["대란","싸움","역사","전쟁"]},
+{a:"Gaeko",t:"Control",g:["참전","형님","클라스","훈계"]},
+{a:"TakeOne",t:"Recontrol",g:["반격","소신","철학","대답"]},
+{a:"JUSTHIS",t:"THISISJUSTHIS",g:["자기소개","스킬","압도","라이브"]},
+{a:"Don Mills",t:"88",g:["힘","떡대","형님","무게"]},
+{a:"Los(로스)",t:"Bad Boy",g:["나쁜놈","교포","LA","갱"]},
+{a:"Chillin Homie",t:"Wassup",g:["인사","눈빛","기세","무서움"]},
+{a:"Rohann(이로한)",t:"북",g:["북","소리","동양","무게"]},
+{a:"Haon(김하온)",t:"붕붕",g:["명상","긍정","여행","하늘"]},
+{a:"Haon(김하온)",t:"Barcode",g:["바코드","빛","검정","희망"]},
+// 재즈 힙합 / 로파이 / 카페
+{a:"Jazzyfact",t:"Smoking Dreams",g:["담배","꿈","재즈","생각"]},
+{a:"Jazzyfact",t:"Friday Move",g:["불금","이동","클럽","약속"]},
+{a:"Primary",t:"자니",g:["새벽","구질","전여친","물음표"]},
+{a:"Primary",t:"씨스루",g:["파티","여자","시선","클럽"]},
+{a:"Zion.T",t:"Babay",g:["내꺼","견제","사랑","그루브"]},
+{a:"Crucial Star",t:"Flat Shoes",g:["신발","배려","사랑","데이트"]},
+{a:"Crucial Star",t:"Tonight",g:["오늘밤","위로","감성","별"]},
+{a:"Hash Swan",t:"Mashimaro",g:["마시마로","눈","귀차니즘","독특"]},
+{a:"Hash Swan",t:"Alexanger Wang",g:["패션","명품","스타일","멋"]},
+{a:"Reddy(레디)",t:"생각해",g:["고민","이별","사랑","밤"]},
+{a:"Code Kunst",t:"Perfume",g:["향수","냄새","기억","매력"]},
+{a:"G2",t:"1999",g:["과거","미국","향수","가족"]},
+{a:"Samuel Seo(서사무엘)",t:"창문",g:["창문","풍경","생각","알앤비"]},
+{a:"Colde",t:"Your Dog Loves You",g:["강아지","산책","사랑","행복"]},
+// 독특함 / 예술 / 얼터너티브
+{a:"Zior Park",t:"Christian",g:["종교","모순","영어","뮤지컬"]},
+{a:"Balming Tiger",t:"Sexy Nukim",g:["섹시","느낌","대안","RM"]},
+{a:"Omega Sapien",t:"Pop the Tag",g:["택","쇼핑","독특","에너지"]},
+{a:"Sokodomo",t:"GO HOME",g:["집","가자","퇴근","정신없음"]},
+{a:"Lee Hi(이하이)",t:"구원자",g:["비아이","구원","피처링","소울"]},
+{a:"Tablo(타블로)",t:"Airbag",g:["안전","운전","택시","고독"]},
+{a:"Tablo(타블로)",t:"Bad",g:["나쁨","사랑","집착","영화"]},
+{a:"Epik High",t:"Fly",g:["비행","평화","대중","희망"]},
+{a:"Epik High",t:"One",g:["하나","구원","위로"]},
+{a:"Mino",t:"도망가",g:["도망","이별","비겁","후회"]},
+{a:"B.I",t:"해변",g:["바다","여름","이별","파도"]},
+{a:"Swervy",t:"Red Lite",g:["빨강","신호","멈춤","여자"]},
+{a:"Jvcki Wai",t:"Anarchy",g:["무정부","혼란","저항","공주"]},
+{a:"Bryn(브린)",t:"Lilly",g:["꽃","소녀","성장","봄"]},
+{a:"Lee Young Ji",t:"Go High",g:["높이","텐션","에너지","MZ"]},
+{a:"K.One",t:"태지",g:["서태지","존경","오마주","전설"]},
+{a:"Double K",t:"Ment",g:["멘트","공연","마무리","진심"]},
+{a:"Outsider(아웃사이더)",t:"외톨이",g:["속사포","혼자","상처","빠름"]},
+{a:"MC Sniper",t:"BK Love",g:["사랑","이별","노래방","bk"]},
+{a:"MC Sniper",t:"솔아솔아 푸르른 솔아",g:["민중","저항","역사","한국"]},
+{a:"Baechigi(배치기)",t:"마이동풍",g:["신남","무시","흥","뽕짝"]},
+{a:"Baechigi(배치기)",t:"눈물샤워",g:["눈물","감성","에일리","비"]},
+{a:"Geeks(긱스)",t:"Officially Missing You",g:["국민","사랑","카페","커플"]},
+{a:"Mighty Mouth",t:"에너지",g:["에너지","여름","운동","신남"]},
+// ── data1/4.txt: 드릴 / 뉴웨이브 ──
+{a:"Changmo(창모)",t:"Swoosh Flow",g:["나이키","속도","스킬","자랑"]},
+{a:"Changmo(창모)",t:"Beretta",g:["총","갱","위험","친구"]},
+{a:"Bla$e(블라세)",t:"Pop it",g:["터뜨려","드릴","영국","춤"]},
+{a:"Bla$e(블라세)",t:"Power",g:["힘","에너지","운동","헬스"]},
+{a:"Fleeky Bang",t:"My Zone",g:["구역","갱","침범","경고"]},
+{a:"Polodared",t:"B.B.C",g:["방송","자신감","신인","패기"]},
+{a:"NSW yoon",t:"Love",g:["사랑","드릴","반전","박자"]},
+{a:"NSW yoon",t:"Eul",g:["을","갑","하극상","독기"]},
+{a:"Chillin Homie",t:"Stun",g:["기절","충격","공연","눈빛"]},
+{a:"Khan",t:"Bad News",g:["뉴스","사고","문제","악동"]},
+{a:"Lobonabeat!",t:"생일",g:["축하","파티","선물","케이크"]},
+{a:"Zior Park",t:"ACT!VE VOLCANO",g:["화산","폭발","마그마","광기"]},
+{a:"Uneducated Kid",t:"Work Work",g:["일","노동","돈","부자"]},
+{a:"Superbee",t:"Mudo",g:["무한도전","예능","웃음","팬"]},
+{a:"Homies",t:"GENERATION",g:["세대","대표","성공","팀"]},
+{a:"Homies",t:"Clavier",g:["피아노","클래식","우아","돈"]},
+{a:"Royal 44",t:"Human Chandelier",g:["보석","빛","샹들리에","자랑"]},
+// 고등래퍼 출신 / 영블러드
+{a:"VINXEN(빈첸)",t:"Sinking Down",g:["우울","심해","가라앉음","지하"]},
+{a:"VINXEN(빈첸)",t:"그대들은 어떤 기분이신가요",g:["질문","우울","공감","약"]},
+{a:"VINXEN(빈첸)",t:"유재석",g:["유명","부담","압박","비교"]},
+{a:"HAON(김하온)",t:"Adios",g:["작별","인사","여행","긍정"]},
+{a:"HAON(김하온)",t:"Flower",g:["꽃","개화","성장","봄"]},
+{a:"Young B(양홍원)",t:"아침에",g:["새벽","해","숙취","담배"]},
+{a:"Young B(양홍원)",t:"Rose",g:["장미","가시","사랑","상처"]},
+{a:"Young B(양홍원)",t:"Revenge",g:["복수","성공","증명","야망"]},
+{a:"NO:EL(노엘)",t:"00",g:["공공","시작","숫자","탄생"]},
+{a:"NO:EL(노엘)",t:"SUMMER 19'",g:["여름","더위","기억","휴가"]},
+{a:"Osshun Gum(오션검)",t:"Osshun Waves",g:["파도","평화","바다","잠"]},
+{a:"Bully Da Ba$tard",t:"Bipolar",g:["조울증","감정","기복","병원"]},
+{a:"Lee Young Ji",t:"Dark Room",g:["암실","혼자","생각","어둠"]},
+{a:"Layone(래원)",t:"원효대사",g:["해골물","깨달음","독특","물"]},
+{a:"Trade L",t:"나침반",g:["방향","길","혼란","미래"]},
+{a:"Trade L",t:"Memory",g:["기억","사진","추억","앨범"]},
+{a:"Park Hyeon Jin",t:"Paradise",g:["낙원","행복","이상향","꿈"]},
+// 크루 단체곡 / 레이블
+{a:"Indigo Music",t:"IndiGO",g:["단체","운전","질주","팀"]},
+{a:"Indigo Music",t:"Flex",g:["여름","돈","자랑","휴가"]},
+{a:"Just Music",t:"Rain Showers Remix",g:["비","우산","단비","공연"]},
+{a:"Just Music",t:"More Days",g:["더","욕심","시간","노력"]},
+{a:"Ambition Musik",t:"Band",g:["밴드","악기","합주","친구"]},
+{a:"Ambition Musik",t:"Bition Way",g:["길","마이웨이","성공","우리"]},
+{a:"Hi-Lite Records",t:"My Team",g:["팀","가족","식구","의리"]},
+{a:"Hi-Lite Records",t:"Air",g:["공기","숨","산소","하늘"]},
+{a:"VMC",t:"악당출현",g:["빌런","악당","등장","무게"]},
+{a:"VMC",t:"Limbo",g:["림보","게임","유연","통과"]},
+{a:"119 Remix",t:"119",g:["불","소방관","구조","단체"]},
+{a:"Fanxy Child",t:"Fanxy Child",g:["팬시","멋","스타일","조합"]},
+{a:"Fanxy Child",t:"Y",g:["질문","이유","궁금","와이"]},
+{a:"DPR",t:"Legacy",g:["유산","전설","역사","기록"]},
+{a:"Dynamic Duo & Friends",t:"동전한닢 Remix",g:["클래식","단체","전설","역사"]},
+{a:"Jay Park & Friends",t:"The Purge",g:["퍼지","사이렌","혼란","밤"]},
+// 사랑 / 달달함 / 썸
+{a:"Beenzino",t:"If I Die Tomorrow",g:["죽음","내일","유언","사랑"]},
+{a:"Beenzino",t:"Nike Shoes",g:["신발","선물","데이트","커플"]},
+{a:"Crucial Star",t:"Paris",g:["파리","프랑스","여행","로맨틱"]},
+{a:"Giriboy",t:"을",g:["호구","사랑","갑을","부탁"]},
+{a:"Giriboy",t:"사랑이었나봐",g:["이별","후회","과거","미련"]},
+{a:"pH-1",t:"Nerdy Love",g:["너드","안경","사랑","백예린"]},
+{a:"pH-1",t:"365&7",g:["매일","일주일","반복","성실"]},
+{a:"Wonstein",t:"존재만으로",g:["존재","가치","사랑","감동"]},
+{a:"Big Naughty",t:"정이라고 하자",g:["정","사랑","우정","관계"]},
+{a:"Leellamarz",t:"아이",g:["순수","동심","사랑","보호"]},
+{a:"Skinny Brown",t:"If I Die",g:["죽음","가정","사랑","진심"]},
+{a:"ASH ISLAND",t:"One More Night",g:["하루만","밤","부탁","애절"]},
+{a:"Coogie",t:"Alone",g:["혼자","외로움","기다림","솔로"]},
+{a:"Loco",t:"감아",g:["눈","휴식","위로","포옹"]},
+{a:"Loco",t:"주지마",g:["술","위험","유혹","거절"]},
+{a:"Gray",t:"하기나 해",g:["일","잔소리","현실","동기부여"]},
+{a:"Gray",t:"꿈이 뭐야",g:["꿈","질문","미래","희망"]},
+{a:"Elo",t:"OSAKA",g:["오사카","일본","여행","밤"]},
+{a:"Hoody",t:"한강",g:["한강","산책","물","바람"]},
+// 숨겨진 명곡 / 마이너 / 예술병
+{a:"Kim Ximya",t:"DOG",g:["개","짖어","공격","날것"]},
+{a:"Kim Ximya",t:"Manual",g:["설명서","규칙","복잡","난해"]},
+{a:"XXX",t:"Liquor",g:["술","취함","비틀","어지러움"]},
+{a:"E-Sens",t:"Back In Time",g:["시간","과거","여행","회상"]},
+{a:"E-Sens",t:"Tick Tock",g:["시계","초조","압박","소리"]},
+{a:"Justhis",t:"Omen",g:["징조","불길","시작","예고"]},
+{a:"Khundi Panda",t:"Nevercomadown",g:["상승","하이","텐션","각성"]},
+{a:"Son Simba",t:"Anti-Hype",g:["거품","반대","진짜","소신"]},
+{a:"Qwala",t:"Zag",g:["지그재그","방향","혼란","움직임"]},
+{a:"Jjk",t:"378",g:["번호","기록","숫자","의미"]},
+{a:"P-Type",t:"광화문",g:["서울","거리","군중","역사"]},
+{a:"Rhyme-A-",t:"K-Bonics",g:["교과서","기본","라임","공부"]},
+{a:"Fana(화나)",t:"Rhymonic Storm",g:["폭풍","라임","몬스터","괴물"]},
+{a:"Fana(화나)",t:"Que Sera Sera",g:["운명","미래","긍정","주문"]},
+{a:"Ignito",t:"Beholder",g:["관찰자","눈","심연","지켜봄"]},
+{a:"Hunger Noma",t:"Trill",g:["진실","트릴","진심","거짓"]},
+{a:"B-Free",t:"Hot Summer",g:["여름","더위","땀","태양"]},
+{a:"B-Free",t:"Yoga Flame",g:["불","요가","공격","게임"]},
+// ── data1/5.txt: 가사 맛집 / 펀치라인 ──
+{a:"QM(큐엠)",t:"Nazca",g:["나스카","예술","미스터리","라인"]},
+{a:"QM(큐엠)",t:"U.G.R.S",g:["언더","현실","배고픔","증명"]},
+{a:"Huckleberry P",t:"Human Torch",g:["불","열정","공연","라이브"]},
+{a:"Odi(오디)",t:"Open Monday",g:["월요일","시작","노동","묵직"]},
+{a:"Rohann(이로한)",t:"Webster B",g:["이름","시작","소개","붐뱁"]},
+{a:"TakeOne(테이크원)",t:"녹색이념",g:["이념","철학","신념","무거움"]},
+{a:"Justhis",t:"Sell The Soul",g:["영혼","악마","거래","성공"]},
+{a:"Khundi Panda",t:"설계도",g:["미래","계획","건축","완성"]},
+{a:"Kim Ximya",t:"Drive Thru",g:["패스트푸드","속도","소비","현대"]},
+{a:"P-Type",t:"Die Hard",g:["불사","장인","고집","라임"]},
+{a:"Ignito",t:"Lost In The City",g:["도시","상실","고독","어둠"]},
+{a:"Fana",t:"Power",g:["힘","소리","압박","에너지"]},
+{a:"Verbal Jint",t:"1219 Epiphany",g:["깨달음","고백","일기","성찰"]},
+{a:"Jerry.K",t:"다툼",g:["싸움","화해","관계","대화"]},
+{a:"Don Malik",t:"Yellow",g:["노랑","경고","주의","신호"]},
+{a:"Nucksal",t:"밥값",g:["노동","가족","책임","현실"]},
+{a:"Deepflow",t:"Yanghwa",g:["양화","다리","서울","상징"]},
+{a:"Chaboom(차붐)",t:"리빠똥",g:["안산","거리","리얼","동네"]},
+{a:"Chaboom(차붐)",t:"에쿠스",g:["차","성공","형님","간지"]},
+// 여성 래퍼 / 걸크러쉬 / 퀸
+{a:"SINCE(신스)",t:"Spring Rain",g:["봄비","노력","성공","눈물"]},
+{a:"SINCE(신스)",t:"Miracle",g:["기적","반전","우승","드라마"]},
+{a:"Mirani(미란이)",t:"Daisy",g:["데이지","꽃","성장","희망"]},
+{a:"Mirani(미란이)",t:"Tic Tac!",g:["시간","시계","초조","기회"]},
+{a:"Jvcki Wai",t:"Dding",g:["띵","돈","머리","한방"]},
+{a:"Jvcki Wai",t:"Munch",g:["먹방","파티","중독","약"]},
+{a:"Bryn(브린)",t:"Stop Talking!",g:["조용","닥쳐","경고","무시"]},
+{a:"Swervy(스월비)",t:"Art Gang Money",g:["예술","갱","돈","삼위일체"]},
+{a:"Swervy(스월비)",t:"Mama Lisa",g:["엄마","모나리자","명화","걸작"]},
+{a:"Yoonmirae",t:"Get It In",g:["액션","전투","시작","자신감"]},
+{a:"Jessi(제시)",t:"SSENUNNI",g:["쎈언니","강함","카리스마","대장"]},
+{a:"Jessi(제시)",t:"Gucci",g:["명품","구찌","자랑","스타일"]},
+{a:"CL",t:"The Baddest Female",g:["나쁜기집애","여왕","탑","솔로"]},
+{a:"CL",t:"Hello Bitches",g:["인사","포스","춤","글로벌"]},
+{a:"Cheetah(치타)",t:"Coma 07",g:["코마","부활","독기","생존"]},
+{a:"Yezi(예지)",t:"Crazy Dog",g:["미친개","광기","공격","디스"]},
+{a:"Tymee(타이미)",t:"Cinderella",g:["신데렐라","디스","전쟁","과거"]},
+{a:"Giant Pink",t:"Mirror Mirror",g:["거울","자아","반사","질문"]},
+{a:"Sleeq(슬릭)",t:"Ma Girls",g:["여자","응원","연대","친구"]},
+// 운동할 때 / 헬스장
+{a:"Los(로스)",t:"Gyopo Rap",g:["교포","미국","근육","영어"]},
+{a:"Los(로스)",t:"Hustle",g:["허슬","노력","땀","성공"]},
+{a:"Chillin Homie",t:"Jealous",g:["질투","시기","무시","성장"]},
+{a:"Rohann",t:"Like It",g:["좋아","취향","긍정","파워"]},
+{a:"Mckdaddy",t:"I'm In Trouble",g:["문제","사고","경고","위험"]},
+{a:"Khakii(카키)",t:"Bass",g:["베이스","저음","둥둥","리듬"]},
+{a:"Ourealgoat(아우릴고트)",t:"Family Business",g:["가족","사업","책임","돈"]},
+{a:"Ourealgoat(아우릴고트)",t:"Muddy",g:["진흙","바닥","고생","극복"]},
+{a:"Don Mills",t:"Ye I Need",g:["필요","원해","갈망","목표"]},
+{a:"Don Mills",t:"Knock",g:["노크","문","진입","시작"]},
+{a:"Woodie Gochild",t:"Roll Cake",g:["케이크","파티","축하","달콤"]},
+{a:"Zene The Zilla",t:"Sarah Snyder",g:["모델","짝사랑","패션","스타"]},
+{a:"Dbo(디보)",t:"Space X",g:["우주","비행","독특","화성"]},
+{a:"Dbo(디보)",t:"Horse",g:["말","달려","소리","동물"]},
+{a:"Uneducated Kid",t:"Drop Top",g:["오픈카","뚜껑","바람","자랑"]},
+{a:"Paul Blanco",t:"Winter",g:["겨울","추위","고독","냉정"]},
+{a:"Homies",t:"Never",g:["절대","부정","결심","의지"]},
+{a:"Homies",t:"Drip",g:["멋","스타일","물","흐름"]},
+// 알앤비 힙합 / 감성 보컬
+{a:"Zion.T",t:"Just",g:["그냥","짝사랑","이유","담담"]},
+{a:"Zion.T",t:"Eat",g:["꺼내먹어요","위로","간식","달달"]},
+{a:"Zion.T",t:"No Make Up",g:["쌩얼","자연","사랑","칭찬"]},
+{a:"Crush",t:"Hug Me",g:["포옹","안아줘","사랑","온기"]},
+{a:"Crush",t:"Sometimes",g:["가끔","그리움","생각","비"]},
+{a:"Dean",t:"Instagram",g:["인스타","sns","밤","불면"]},
+{a:"Dean",t:"Pour Up",g:["술","파티","여자","오늘밤"]},
+{a:"Dean",t:"bonnie & clyde",g:["커플","범죄","도망","사랑"]},
+{a:"Colde",t:"Control Me",g:["통제","마음","사랑","부탁"]},
+{a:"Code Kunst",t:"Beside Me",g:["옆","곁","의지","위로"]},
+{a:"Offonoff",t:"Dance",g:["춤","분위기","무드","새벽"]},
+{a:"Offonoff",t:"Photograph",g:["사진","기억","추억","순간"]},
+{a:"Tabber",t:"007",g:["비밀","작전","미스터리","밤"]},
+{a:"Miso",t:"Take Me",g:["데려가","꿈","몽환","여행"]},
+{a:"Rad Museum",t:"Dancing in the Rain",g:["비","춤","우산","감성"]},
+{a:"Jooyoung(주영)",t:"Wet",g:["젖음","비","분위기","섹시"]},
+{a:"Hoody(후디)",t:"Adios",g:["작별","안녕","이별","끝"]},
+{a:"Sole(쏠)",t:"RIDE",g:["라이드","드라이브","차","바람"]},
+{a:"Thama",t:"Do It For Love",g:["사랑","이유","목적","행복"]},
+{a:"Gsoul",t:"Hate Everything",g:["싫어","이별","후회","짜증"]},
+// 올드스쿨 가요 힙합 / 싸이월드 감성
+{a:"MC Sniper",t:"Gloomy Sunday",g:["우울","일요일","슬픔","비극"]},
+{a:"MC Sniper",t:"Better Than Yesterday",g:["어제","오늘","희망","성장"]},
+{a:"Outsider",t:"Loner",g:["외톨이","속도","상처","혼자"]},
+{a:"Outsider",t:"Speed Racer",g:["레이서","속도","질주","경쟁"]},
+{a:"Free Style",t:"Y",g:["와이","미니홈피","도토리","이별"]},
+{a:"Baechigi",t:"Nice to meet you",g:["반가워","인사","만남","신남"]},
+{a:"Epik High",t:"Fan",g:["팬","집착","사랑","광기"]},
+{a:"Epik High",t:"Love Love Love",g:["사랑","반복","달달","고백"]},
+{a:"Supreme Team",t:"Then Then Then",g:["그땐","추억","과거","후회"]},
+{a:"Supreme Team",t:"Supermagic",g:["마법","신남","에너지","주문"]},
+{a:"Untouchable",t:"Tell Me Why",g:["이유","질문","답답","이별"]},
+{a:"Untouchable",t:"Oh",g:["오","감탄","신남","파티"]},
+{a:"Sunny Side",t:"You are the one",g:["너","유일","사랑","고백"]},
+{a:"Crown J",t:"Fly Boy",g:["비행","소년","자유","멋"]},
+{a:"H-Eugene",t:"Life is",g:["인생","삶","질문","철학"]}
 ];
 
-// ── DOM ──
-const moodInput  = document.getElementById('moodInput');
-const goBtn      = document.getElementById('goBtn');
-const loader     = document.getElementById('loader');
-const errorMsg   = document.getElementById('errorMsg');
-const results    = document.getElementById('results');
-const footer     = document.getElementById('footer');
+// ── 동의어 맵 ──
+const SYN={
+  "빡침":["분노","화","빡침","스트레스","짜증","혐오","폭발"],
+  "회사":["회사","일","직장","노동","상사","퇴사","현실","답답"],
+  "우울":["우울","슬픔","눈물","이별","상처","외로움","고독","쓸쓸"],
+  "새벽":["새벽","밤","불면","잠","불면증","달","야경"],
+  "술":["술","소주","취함","혼술","맥주","숙취","클럽"],
+  "사랑":["사랑","달달","썸","데이트","짝사랑","고백","연애","커플"],
+  "이별":["이별","헤어진","후회","미련","그리움","눈물","과거"],
+  "돈":["돈","성공","플렉스","부자","야망","자수성가","명품"],
+  "드라이브":["드라이브","차","운전","도로","질주","밤","도시","야경"],
+  "운동":["운동","헬스","에너지","파워","근육","땀","달려","질주"],
+  "파티":["파티","클럽","춤","술","신남","놀자","밤새"],
+  "비":["비","우산","장마","비오는","젖음"],
+  "힙합":["힙합","붐뱁","랩","스킬","플로우","라임","마이크"],
+  "여름":["여름","바다","휴가","수영","해변","더위","청량"],
+  "겨울":["겨울","눈","추위","크리스마스"],
+  "가족":["가족","아버지","엄마","할아버지","부모"],
+  "친구":["친구","의리","동네","크루","팀"],
+  "자신감":["자신감","카리스마","최고","왕","리더","자랑"],
+  "감성":["감성","몽환","무드","분위기","서정"],
+  "스트레스":["스트레스","빡침","폭발","답답","짜증","화","분노"],
+  "휴식":["휴식","쉬고싶다","편안","집","혼자","칠"],
+  "추억":["추억","옛날","과거","그때","향수","회상"],
+  "죽":["분노","혐오","빡침","스트레스","폭발","다꺼져"],
+  "싶":["분노","빡침","스트레스","폭발"],
+  "때문":["스트레스","답답","짜증","분노","빡침"],
+  "짜증":["짜증","분노","빡침","스트레스","화","폭발"],
+  "슬프":["우울","슬픔","눈물","이별","상처"],
+  "행복":["행복","긍정","신남","사랑","달달","웃음"],
+  "외로":["외로움","혼자","고독","쓸쓸","새벽"],
+  "무서":["무서움","공포","어두움","악마","지옥"],
+  "보고싶":["그리움","이별","추억","사랑","과거"],
+  "퇴근":["퇴사","일","직장","노동","현실","피곤"],
+  "피곤":["피곤","일","노동","잠","불면","답답"],
+  "여자":["여자","섹시","여자친구","데이트","썸"],
+  "남자":["남자","상남자","형님","의리","전쟁"],
+  "디스":["디스","싸움","전투","전쟁","공격","복수"],
+  "올드스쿨":["옛날","클래식","근본","전설","추억","올드스쿨"],
+  "재즈":["재즈","카페","여유","로파이","생각"],
+  "여행":["여행","비행기","바다","휴가","드라이브"]
+};
 
-// ── 프리셋 입력 ──
-function setMood(text) {
-  moodInput.value = text;
-  moodInput.focus();
+// ── DOM ──
+const moodInput=document.getElementById('moodInput');
+const goBtn=document.getElementById('goBtn');
+const loader=document.getElementById('loader');
+const results=document.getElementById('results');
+const footer=document.getElementById('footer');
+
+function setMood(t){moodInput.value=t;moodInput.focus();}
+
+// ── 키워드 추출 ──
+function extractKeywords(input){
+  const words=input.replace(/[^\uAC00-\uD7A3a-zA-Z0-9\s]/g,'').split(/\s+/).filter(w=>w.length>0);
+  const expanded=new Set();
+  words.forEach(w=>{
+    expanded.add(w);
+    Object.keys(SYN).forEach(key=>{
+      if(w.includes(key)||key.includes(w)){
+        SYN[key].forEach(s=>expanded.add(s));
+      }
+    });
+  });
+  return [...expanded];
 }
 
-// ── 메인 추천 함수 ──
-async function recommend() {
-  const mood = moodInput.value.trim();
-  if (!mood) {
+// ── 점수 매기기 ──
+function scoreTracks(keywords){
+  return T.map((track,i)=>{
+    let score=0;
+    keywords.forEach(kw=>{
+      track.g.forEach(tag=>{
+        if(tag===kw) score+=3;
+        else if(tag.includes(kw)||kw.includes(tag)) score+=1;
+      });
+    });
+    return {idx:i,score,rand:Math.random()};
+  });
+}
+
+// ── 추천 ──
+function recommend(){
+  const mood=moodInput.value.trim();
+  if(!mood){
     moodInput.focus();
     moodInput.classList.add('!border-red-500');
-    setTimeout(() => moodInput.classList.remove('!border-red-500'), 1500);
+    setTimeout(()=>moodInput.classList.remove('!border-red-500'),1500);
     return;
   }
 
-  // UI 초기화
-  goBtn.disabled = true;
-  results.innerHTML = '';
-  errorMsg.classList.add('hidden');
-  errorMsg.textContent = '';
+  goBtn.disabled=true;
+  results.innerHTML='';
   footer.classList.add('hidden');
   loader.classList.remove('hidden');
 
-  let tracks = null;
+  setTimeout(()=>{
+    const keywords=extractKeywords(mood);
+    let scored=scoreTracks(keywords);
 
-  try {
-    const res = await fetch('/api/recommend', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ mood })
-    });
+    // 점수순 정렬, 같으면 랜덤
+    scored.sort((a,b)=>b.score-a.score||(a.rand-b.rand));
 
-    if (!res.ok) {
-      throw new Error(`API 응답 오류: ${res.status}`);
+    let picks;
+    if(scored[0].score===0){
+      // 매칭 없으면 랜덤 10곡
+      picks=scored.sort(()=>Math.random()-0.5).slice(0,10);
+    } else {
+      // 같은 아티스트 중복 제거 (아티스트명 정규화)
+      const seen=new Set();
+      const unique=[];
+      for(const s of scored){
+        if(s.score===0) break;
+        const artist=T[s.idx].a.replace(/\(.*?\)/g,'').trim();
+        if(!seen.has(artist)){
+          seen.add(artist);
+          unique.push(s);
+        }
+        if(unique.length>=10) break;
+      }
+      // 10개 미만이면 랜덤으로 채움
+      if(unique.length<10){
+        for(const s of scored){
+          const artist=T[s.idx].a.replace(/\(.*?\)/g,'').trim();
+          if(!seen.has(artist)){
+            seen.add(artist);
+            unique.push(s);
+          }
+          if(unique.length>=10) break;
+        }
+      }
+      picks=unique;
     }
 
-    const data = await res.json();
-    tracks = data.tracks;
+    const tracks=picks.map(p=>T[p.idx]);
 
-    if (!Array.isArray(tracks) || tracks.length === 0) {
-      throw new Error('올바른 형식이 아닙니다.');
-    }
-  } catch (err) {
-    console.warn('API 에러:', err);
     loader.classList.add('hidden');
-    errorMsg.textContent = 'AI 호출이 실패했습니다';
-    errorMsg.classList.remove('hidden');
-    goBtn.disabled = false;
-    return;
-  }
-
-  // 렌더링
-  loader.classList.add('hidden');
-  renderTracks(tracks);
-  footer.classList.remove('hidden');
-  goBtn.disabled = false;
+    renderTracks(tracks);
+    footer.classList.remove('hidden');
+    goBtn.disabled=false;
+  },600);
 }
 
-// ── 트랙 리스트 렌더링 ──
-function renderTracks(tracks) {
-  results.innerHTML = '';
-
-  tracks.forEach((track, i) => {
-    const ytQuery = encodeURIComponent(`${track.artist} ${track.title}`);
-    const ytUrl   = `https://music.youtube.com/search?q=${ytQuery}`;
-
-    const card = document.createElement('div');
-    card.className = 'track-card rounded-lg p-4 fade-in-up';
-    card.style.animationDelay = `${i * 0.07}s`;
-
-    card.innerHTML = `
+// ── 렌더링 ──
+function renderTracks(tracks){
+  results.innerHTML='';
+  tracks.forEach((track,i)=>{
+    const q=encodeURIComponent(`${track.a.replace(/\(.*?\)/g,'')} ${track.t}`);
+    const url=`https://music.youtube.com/search?q=${q}`;
+    const card=document.createElement('div');
+    card.className='track-card rounded-lg p-4 fade-in-up';
+    card.style.animationDelay=`${i*0.07}s`;
+    card.innerHTML=`
       <div class="flex items-start justify-between gap-3">
         <div class="flex-1 min-w-0">
           <div class="flex items-center gap-2 mb-1">
-            <span class="text-xs font-bold neon-text opacity-70">${String(i + 1).padStart(2, '0')}</span>
-            <h3 class="font-bold text-white text-sm md:text-base truncate">${escapeHtml(track.title)}</h3>
+            <span class="text-xs font-bold neon-text opacity-70">${String(i+1).padStart(2,'0')}</span>
+            <h3 class="font-bold text-white text-sm md:text-base truncate">${esc(track.t)}</h3>
           </div>
-          <p class="text-xs md:text-sm text-gray-400 mb-1">${escapeHtml(track.artist)}</p>
-          <p class="text-xs text-gray-500 leading-relaxed">${escapeHtml(track.reason)}</p>
+          <p class="text-xs md:text-sm text-gray-400 mb-1">${esc(track.a)}</p>
+          <p class="text-xs text-gray-500">${track.g.map(t=>'#'+t).join(' ')}</p>
         </div>
-        <a href="${ytUrl}" target="_blank" rel="noopener noreferrer" class="yt-btn flex items-center gap-1 mt-1">
-          ▶ YT Music
-        </a>
-      </div>
-    `;
-
+        <a href="${url}" target="_blank" rel="noopener noreferrer" class="yt-btn flex items-center gap-1 mt-1">▶ YT Music</a>
+      </div>`;
     results.appendChild(card);
   });
 }
 
-// ── HTML 이스케이프 ──
-function escapeHtml(str) {
-  const div = document.createElement('div');
-  div.textContent = str || '';
-  return div.innerHTML;
-}
+function esc(s){const d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
 </script>
-
 </body>
 </html>
