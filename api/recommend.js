@@ -80,7 +80,7 @@ export default async function handler(req) {
     if (!geminiRes.ok) {
       const errText = await geminiRes.text();
       console.error('Gemini API error:', geminiRes.status, errText);
-      return new Response(JSON.stringify({ error: 'AI 서비스 응답 오류' }), {
+      return new Response(JSON.stringify({ error: 'AI 서비스 응답 오류', status: geminiRes.status, detail: errText.slice(0, 500) }), {
         status: 502,
         headers: { 'Content-Type': 'application/json' },
       });
